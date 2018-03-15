@@ -1,6 +1,6 @@
-import { createInterface } from 'readline';
+import { createInterface, clearLine as readlineClearLine, cursorTo } from 'readline';
 import chalk, { Chalk } from 'chalk';
-import { bind, curry, pipe } from 'ramda';
+import { bind, curry, pipe, tap } from 'ramda';
 import { EventEmitter } from 'events';
 
 export interface Readline extends EventEmitter {
@@ -29,9 +29,15 @@ const createReadline: ReadlineCreator = () => {
     readline.setPrompt(chalk.green('Message → '));
     readline.prompt();
 
+    const clearLine = () => {
+        process.stdout.write('\r\x1b[K');
+    };
+
+    const prompt = () => readline.prompt();
+
     const eventEmitter = Object.assign(new EventEmitter(), {
-        remote: pipe(prependString(chalk.gray('Remote → ')), console.log),
-        error: pipe(prependString(chalk.red('Error → ')), console.log),
+        remote: pipe(prependString(chalk.gray('Remote → ')), tap(clearLine), console.log, prompt),
+        error: pipe(prependString(chalk.red('Error → ')), tap(clearLine), console.log, prompt),
         info: console.log,
     });
     readline.on('line', data => {
