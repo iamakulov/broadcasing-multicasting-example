@@ -1,10 +1,10 @@
 import { networkInterfaces, NetworkInterfaceInfoIPv4 } from 'os';
 import { Netmask } from 'netmask';
-import { compose, flatten, filter, pipe, pick, prop, tap, values } from 'ramda';
+import { compose, equals, flatten, find, pipe, pick, prop, tap, values } from 'ramda';
 
 const getActiveInterface = () => {
-    const isPublicIpv4 = val => val.family === 'IPv4' && !val.internal;
-    const pickActiveInterface = pipe(values, flatten, filter(isPublicIpv4), prop('0'));
+    const isSpecifiedCidr = pipe(prop('cidr'), equals(process.env.CIDR_TO_USE));
+    const pickActiveInterface = pipe(values, flatten, find(isSpecifiedCidr));
 
     return pickActiveInterface(networkInterfaces()) as NetworkInterfaceInfoIPv4;
 };
