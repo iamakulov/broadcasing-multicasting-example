@@ -19,4 +19,4 @@ export const getBroadcastAddress = pipe(
     (cidr: string) => new Netmask(cidr).broadcast,
 ) as () => string;
 
-export const getMulticastAddress = () => '224.0.1.3';
+export const getMulticastAddress = () => process.env.MULTICAST_ADDRESS;
